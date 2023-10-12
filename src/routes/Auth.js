@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { authService } from '../firebase';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup  } from "firebase/auth";
+
 
 const Auth = ()=>{
   const [email, setEmail] = useState('');
@@ -51,14 +52,41 @@ const Auth = ()=>{
       setPassword(value);
     }    
   }
+  const toggleAccount = (prev)=>setNewAccount((prev)=>!prev)
+  //이전 값의 반대로 변경 true or false
+  const onSocialClick = ()=>{
+    const provider = new GoogleAuthProvider();
+    signInWithPopup(auth, provider)
+    .then((result) => {
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      const token = credential.accessToken;
+      const user = result.user;
+      console.log('user',user)
+      console.log('token',token)
+    }).catch((error) => {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      const email = error.customData.email;
+      const credential = GoogleAuthProvider.credentialFromError(error);
+      console.log(errorCode,errorMessage,email,credential)
+    });
+
+  }
+
   return (
     <div>
     <form onSubmit={onSubmit}>
       <input name="email" type="email" placeholder='email' value={email} onChange={onChange}/>
       <input name="password" type="password" placeholder='password' value={password} onChange={onChange}/>
-      <button>{newAccount ? "create Account" : "Login in"} </button>
+      <button type="submit">{newAccount ? "create Account" : "Login"} </button>
+      <button type="button" onClick={onSocialClick}>{newAccount ? "Google Sign up" : "Google Login"} </button>
     </form>
+    <hr/>
     {error}
+    <div>
+      <button type="button" onClick={toggleAccount}>{newAccount ? "Login" : "create Account"} </button>
+
+    </div>
   </div>
   )
 
