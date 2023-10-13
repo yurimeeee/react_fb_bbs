@@ -71,7 +71,7 @@ const Home = ({userObj})=>{
       <ul>
       {
         posts.map(item=>
-          <Post key={item.id} postObj={item} userConfirm={item.uid === userObj.userObj}></Post>
+          <Post key={item.id} postObj={item} userConfirm={item.uid === userObj}></Post>
         )
       }
       </ul>
