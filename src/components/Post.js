@@ -1,16 +1,27 @@
 import React, { useState } from "react";
 import { doc, deleteDoc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
+import { getStorage, ref, deleteObject } from "firebase/storage";
 
 // await deleteDoc(doc(db, "cities", "DC"));  //문서삭제
 // await 가 있으면 그 함수는 비동기 async야야함  
 
 
 const Post = ({postObj,userConfirm})=> {
-  console.log(postObj);
+  // console.log(postObj);
   const deletePost = async ()=> {
     if(window.confirm('정말 삭제할까요?')){
       await deleteDoc(doc(db, "posts", postObj.id)); 
+      // Create a reference to the file to delete
+    const storage = getStorage();
+    const storageRef = ref(storage, postObj.attachmentURL); //접속 사용자 id 폴더
+    
+    // Delete the file
+    deleteObject(storageRef).then(() => {
+      // File deleted successfully
+    }).catch((error) => {
+      // Uh-oh, an error occurred!
+    });
     }
   }
 
@@ -59,6 +70,7 @@ const onSubmit = async(e) =>{
         ) : (
           <>
             <h4>{postObj.content}</h4>
+            { postObj.attachmentURL && (<img src={postObj.attachmentURL} alt="" width="200px"></img>)}
                 { 
               userConfirm && (
                 <>
